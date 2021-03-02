@@ -6,8 +6,10 @@ import numpy
 import turtle as turtle_mod
 
 
-def _draw_curve_async(points):
+def _draw_curve_async(points, color=None):
     turtle = turtle_mod.Turtle()
+    if color is not None:
+        turtle.pencolor(color)
 
     p0 = None
 
@@ -34,8 +36,11 @@ def draw_curve(points):
     return cnt
 
 
-def draw_curves(curves, t=10):
-    all_gens = collections.OrderedDict((_draw_curve_async(points), 0) for points in curves)
+def draw_curves(curves, colors=None, t=10):
+    all_gens = collections.OrderedDict(
+        (_draw_curve_async(points, color=None if colors is None else colors[idx]), 0)
+        for idx, points in enumerate(curves)
+    )
     done_gens = set()
 
     def one_step():
@@ -116,13 +121,17 @@ def main():
     #     calc_circle(100, 100, 50),
     #     calc_spiro(50, 50, 220, 65, 0.8),
     # ])
-    draw_curves(list(
-        calc_spiro(**kwargs)
-        for kwargs in (
-            calc_rand_spiro(turtle_mod.window_width(), turtle_mod.window_height()) for
-            _ in range(2)
-        )
-    ))
+    num_spiros = 2
+    draw_curves(
+        list(
+            calc_spiro(**kwargs)
+            for kwargs in (
+                calc_rand_spiro(turtle_mod.window_width(), turtle_mod.window_height()) for
+                _ in range(num_spiros)
+            )
+        ),
+        colors=numpy.random.rand(num_spiros, 3)
+    )
     turtle_mod.mainloop()
 
 
