@@ -2,7 +2,7 @@ import numpy
 import turtle as turtle_mod
 
 
-def draw_points_gen(points):
+def _draw_points_gen(points):
     turtle = turtle_mod.Turtle()
 
     for idx, p in enumerate(points):
@@ -19,7 +19,7 @@ def draw_points_gen(points):
 
 def draw_points(points):
     cnt = 0
-    for cnt in draw_points_gen(points):
+    for cnt in _draw_points_gen(points):
         pass
     return cnt
 
