@@ -7,14 +7,20 @@ import turtle as turtle_mod
 def _draw_curve_async(points):
     turtle = turtle_mod.Turtle()
 
+    p0 = None
+
     for idx, p in enumerate(points):
         if idx == 0:
             turtle.penup()
             turtle.goto(p[0], p[1])
+            p0 = p
             turtle.pendown()
         else:
             turtle.goto(p[0], p[1])
         yield idx
+
+    if p0 is not None:
+        turtle.goto(p0[0], p0[1])
 
     turtle.hideturtle()
 
@@ -43,10 +49,16 @@ def draw_curves(curves, t=10):
     turtle_mod.ontimer(one_step, t)
 
 
+def _num_revs(inner_r, outer_r):
+    result = inner_r / numpy.gcd(inner_r, outer_r)
+    print('For R={}, r={}, num_revs={}'.format(outer_r, inner_r, result))
+    return result
+
+
 def calc_spiro(x0, y0, outer_r, inner_r, pen_r_pct, rad_incr=0.05):
     k = inner_r / outer_r
 
-    phi = numpy.arange(0, 2 * numpy.pi * inner_r / numpy.gcd(inner_r, outer_r), rad_incr)
+    phi = numpy.arange(0, 2 * numpy.pi * _num_revs(inner_r, outer_r), rad_incr)
     return numpy.asarray([
         x0 + outer_r * ((1 - k) * numpy.cos(phi) + pen_r_pct * k * numpy.cos(phi * (1 - k) / k)),
         y0 + outer_r * ((1 - k) * numpy.sin(phi) + pen_r_pct * k * numpy.sin(phi * (1 - k) / k)),
@@ -58,11 +70,31 @@ def calc_circle(x, y, r):
     return numpy.asarray([x + r * numpy.cos(phi), y + r * numpy.sin(phi)]).T
 
 
+def calc_rand_spiro(window_w, window_h, outer_min=50, inner_min=10, l_min=0.1, l_max=0.9):
+    outer_r = numpy.random.randint(outer_min, min(window_w, window_h) / 2)
+    half_w = window_w / 2 - outer_r
+    half_h = window_h / 2 - outer_r
+    return dict(
+        x0=numpy.random.randint(-half_w, half_w),
+        y0=numpy.random.randint(-half_h, half_h),
+        outer_r=outer_r,
+        inner_r=numpy.random.randint(inner_min, l_max * outer_r),
+        pen_r_pct=numpy.random.uniform(l_min, l_max),
+    )
+
+
 def main():
-    draw_curves([
-        calc_circle(100, 100, 50),
-        calc_spiro(50, 50, 220, 65, 0.8),
-    ])
+    # draw_curves([
+    #     calc_circle(100, 100, 50),
+    #     calc_spiro(50, 50, 220, 65, 0.8),
+    # ])
+    draw_curves(list(
+        calc_spiro(**kwargs)
+        for kwargs in (
+            calc_rand_spiro(turtle_mod.window_width(), turtle_mod.window_height()) for
+            _ in range(2)
+        )
+    ))
     turtle_mod.mainloop()
 
 
