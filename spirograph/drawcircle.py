@@ -1,4 +1,4 @@
-import math
+import numpy
 import turtle
 
 
@@ -12,10 +12,8 @@ def draw_points(x0, y0, points):
 
 
 def draw_circle(x, y, r):
-    points = (
-        (x + r * math.cos(rad), y + r * math.sin(rad))
-        for rad in (math.radians(deg) for deg in range(0, 365, 1))
-    )
+    phi = numpy.arange(0, 2 * numpy.pi, 0.05)
+    points = numpy.asarray([x + r * numpy.cos(phi), y + r * numpy.sin(phi)]).T
     draw_points(x + r, y, points)
 
 
