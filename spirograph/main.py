@@ -1,4 +1,5 @@
 import collections
+import warnings
 
 import numpy
 import turtle as turtle_mod
@@ -55,10 +56,19 @@ def _num_revs(inner_r, outer_r):
     return result
 
 
+def _calc_phis(inner_r, outer_r, rad_incr):
+    return numpy.arange(0, 2 * numpy.pi * _num_revs(inner_r, outer_r), rad_incr)
+
+
 def calc_spiro(x0, y0, outer_r, inner_r, pen_r_pct, rad_incr=0.05):
     k = inner_r / outer_r
 
-    phi = numpy.arange(0, 2 * numpy.pi * _num_revs(inner_r, outer_r), rad_incr)
+    phi = _calc_phis(inner_r, outer_r, rad_incr)
+    if len(phi) > 6000:
+        print('Num-points for R={}, r={} is {} is too long...'.format(outer_r, inner_r, len(phi)))
+        rad_incr *= 2
+        phi = _calc_phis(inner_r, outer_r, rad_incr)
+        print('Adjusted to {} points'.format(len(phi)))
     return numpy.asarray([
         x0 + outer_r * ((1 - k) * numpy.cos(phi) + pen_r_pct * k * numpy.cos(phi * (1 - k) / k)),
         y0 + outer_r * ((1 - k) * numpy.sin(phi) + pen_r_pct * k * numpy.sin(phi * (1 - k) / k)),
@@ -72,13 +82,26 @@ def calc_circle(x, y, r):
 
 def calc_rand_spiro(window_w, window_h, outer_min=50, inner_min=10, k_max=0.6, l_min=0.1, l_max=0.9):
     outer_r = numpy.random.randint(outer_min, min(window_w, window_h) / 2)
+    inner_r = numpy.random.randint(inner_min, k_max * outer_r)
+
+    # Check if the two radii are mutually prime
+    # If so, the number of loops is likely going to be so big, it's going to take forever to render
+    # Then make both radii the adjacent even number, to cut the number of loops at least in half
+    if _num_revs(inner_r, outer_r) == inner_r:
+        print('Raddi R={} and r={} are mutually prime...'.format(outer_r, inner_r))
+        if outer_r % 2 == 1:
+            outer_r -= 1
+        if inner_r % 2 == 1:
+            inner_r -= 1
+        print('Adjusted to R={}, r={}'.format(outer_r, inner_r))
+
     half_w = window_w / 2 - outer_r
     half_h = window_h / 2 - outer_r
     return dict(
         x0=numpy.random.randint(-half_w, half_w),
         y0=numpy.random.randint(-half_h, half_h),
         outer_r=outer_r,
-        inner_r=numpy.random.randint(inner_min, k_max * outer_r),
+        inner_r=inner_r,
         pen_r_pct=numpy.random.uniform(l_min, l_max),
     )
 
