@@ -39,18 +39,18 @@ def draw_curves(curves, t=10):
     done_gens = set()
 
     def one_step():
-        if len(done_gens) < len(all_gens):
-            for gen in all_gens.keys():
-                if gen not in done_gens:
-                    try:
-                        all_gens[gen] = next(gen)
-                    except StopIteration:
-                        done_gens.add(gen)
-                    except tkinter.TclError:
-                        # This means the window got closed by the user while we were drawing
-                        print('Window was closed while drawing...')
-                        return
-            turtle_mod.ontimer(one_step, t)
+        try:
+            if len(done_gens) < len(all_gens):
+                for gen in all_gens.keys():
+                    if gen not in done_gens:
+                        try:
+                            all_gens[gen] = next(gen)
+                        except StopIteration:
+                            done_gens.add(gen)
+                turtle_mod.ontimer(one_step, t)
+        except (tkinter.TclError, turtle_mod.Terminator):
+            # This means the window got closed by the user while we were drawing
+            print('Window was closed while drawing...')
 
     turtle_mod.ontimer(one_step, t)
 
