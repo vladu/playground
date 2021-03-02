@@ -1,4 +1,5 @@
 import collections
+import tkinter
 import warnings
 
 import numpy
@@ -45,6 +46,10 @@ def draw_curves(curves, t=10):
                         all_gens[gen] = next(gen)
                     except StopIteration:
                         done_gens.add(gen)
+                    except tkinter.TclError:
+                        # This means the window got closed by the user while we were drawing
+                        print('Window was closed while drawing...')
+                        return
             turtle_mod.ontimer(one_step, t)
 
     turtle_mod.ontimer(one_step, t)
