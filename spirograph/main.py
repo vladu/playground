@@ -1,14 +1,17 @@
 import numpy
-import turtle
+import turtle as turtle_mod
 
 
 def draw_points(points):
+    turtle = turtle_mod.Turtle()
     turtle.penup()
     turtle.goto(points[0][0], points[0][1])
     turtle.pendown()
 
     for p in points:
         turtle.goto(p[0], p[1])
+
+    turtle.hideturtle()
 
 
 def draw_spiro(x0, y0, outer_r, inner_r, pen_r_pct, rad_incr=0.05):
@@ -29,9 +32,9 @@ def draw_circle(x, y, r):
 
 
 def main():
-    # draw_circle(100, 100, 50)
+    draw_circle(100, 100, 50)
     draw_spiro(50, 50, 220, 65, 0.8)
-    turtle.mainloop()
+    turtle_mod.mainloop()
 
 
 if __name__ == '__main__':
