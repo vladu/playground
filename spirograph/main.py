@@ -70,7 +70,7 @@ def calc_circle(x, y, r):
     return numpy.asarray([x + r * numpy.cos(phi), y + r * numpy.sin(phi)]).T
 
 
-def calc_rand_spiro(window_w, window_h, outer_min=50, inner_min=10, l_min=0.1, l_max=0.9):
+def calc_rand_spiro(window_w, window_h, outer_min=50, inner_min=10, k_max=0.6, l_min=0.1, l_max=0.9):
     outer_r = numpy.random.randint(outer_min, min(window_w, window_h) / 2)
     half_w = window_w / 2 - outer_r
     half_h = window_h / 2 - outer_r
@@ -78,7 +78,7 @@ def calc_rand_spiro(window_w, window_h, outer_min=50, inner_min=10, l_min=0.1, l
         x0=numpy.random.randint(-half_w, half_w),
         y0=numpy.random.randint(-half_h, half_h),
         outer_r=outer_r,
-        inner_r=numpy.random.randint(inner_min, l_max * outer_r),
+        inner_r=numpy.random.randint(inner_min, k_max * outer_r),
         pen_r_pct=numpy.random.uniform(l_min, l_max),
     )
 
