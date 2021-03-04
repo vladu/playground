@@ -1,10 +1,9 @@
 import argparse
 import collections
 import tkinter
-import warnings
+import turtle as turtle_mod
 
 import numpy
-import turtle as turtle_mod
 
 
 def _draw_curve_async(points, color=None):
