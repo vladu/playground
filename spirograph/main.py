@@ -1,3 +1,4 @@
+import argparse
 import collections
 import tkinter
 import warnings
@@ -81,7 +82,7 @@ def calc_spiro(x0, y0, outer_r, inner_r, pen_r_pct, rad_incr=0.05):
         print('Adjusted to {} points'.format(len(phi)))
     return numpy.asarray([
         x0 + outer_r * ((1 - k) * numpy.cos(phi) + pen_r_pct * k * numpy.cos(phi * (1 - k) / k)),
-        y0 + outer_r * ((1 - k) * numpy.sin(phi) + pen_r_pct * k * numpy.sin(phi * (1 - k) / k)),
+        y0 + outer_r * ((1 - k) * numpy.sin(phi) - pen_r_pct * k * numpy.sin(phi * (1 - k) / k)),
     ]).T
 
 
@@ -116,22 +117,55 @@ def calc_rand_spiro(window_w, window_h, outer_min=50, inner_min=10, k_max=0.6, l
     )
 
 
-def main():
-    # draw_curves([
-    #     calc_circle(100, 100, 50),
-    #     calc_spiro(50, 50, 220, 65, 0.8),
-    # ])
-    num_spiros = 2
-    draw_curves(
-        list(
-            calc_spiro(**kwargs)
-            for kwargs in (
-                calc_rand_spiro(turtle_mod.window_width(), turtle_mod.window_height()) for
-                _ in range(num_spiros)
-            )
-        ),
-        colors=numpy.random.rand(num_spiros, 3)
+def _parse_spiro_def(spiro_str):
+    spiro_parts = spiro_str.split(',')
+    if len(spiro_parts) != 3:
+        raise ValueError('Bad spiro definition. Must be a string like "int,int,float"')
+    outer_r = int(spiro_parts[0])
+    inner_r = int(spiro_parts[1])
+    pen_r_pct = float(spiro_parts[2])
+    if pen_r_pct <= 0. or pen_r_pct >= 1.:
+        raise ValueError('pen_r_pct must be between 0 and 1, but was {}'.format(pen_r_pct))
+    return dict(
+        x0=0,
+        y0=0,
+        outer_r=outer_r,
+        inner_r=inner_r,
+        pen_r_pct=pen_r_pct
     )
+
+
+def _parse_spiro_defs(spiros_str):
+    return list(_parse_spiro_def(d) for d in spiros_str.split(';'))
+
+
+def _arg_parse():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-r', '--random', dest='random_count', default=2, help='Number of random spiros to draw')
+    parser.add_argument('-s', '--spiro', dest='spiro_defs', default=None, type=_parse_spiro_defs)
+    parser.add_argument('--demo', default=False, action='store_true')
+    return parser.parse_args()
+
+
+def main():
+    options = _arg_parse()
+    if options.demo:
+        draw_curves([
+            calc_spiro(0, 0, 220, 65, 0.8),
+        ])
+    elif options.spiro_defs is not None:
+        draw_curves(list(calc_spiro(**d) for d in options.spiro_defs))
+    else:
+        draw_curves(
+            list(
+                calc_spiro(**kwargs)
+                for kwargs in (
+                    calc_rand_spiro(turtle_mod.window_width(), turtle_mod.window_height()) for
+                    _ in range(options.random_count)
+                )
+            ),
+            colors=numpy.random.rand(options.random_count, 3)
+        )
     turtle_mod.mainloop()
 
 
