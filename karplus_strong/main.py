@@ -1,33 +1,36 @@
-
-# Sampling rate
-import os
 import wave
-from matplotlib import pyplot as plt
 
 import numpy
 
+# Sampling rate
 FRAME_RATE = 44100
 
 
-def main(clip_length=5):
+def generate_note(freq, clip_length=1):
     nframes = FRAME_RATE * clip_length
-    sound_freq = 220.
-
     t = numpy.arange(nframes) / FRAME_RATE
-    amp = numpy.sin(2 * numpy.pi * sound_freq * t)
-    amp16 = (amp * numpy.iinfo(numpy.int16).max).astype(numpy.int16)
+    amp = numpy.sin(2 * numpy.pi * freq * t)
+    return amp
 
-    # plt.plot(t[:1000], amp16[:1000])
-    # plt.show()
 
-    with wave.open('sine220.wav', 'wb') as f:
+def amp_to_wav(amp):
+    return (amp * numpy.iinfo(numpy.int16).max).astype(numpy.int16).tobytes()
+
+
+def write_wav(fname, wav):
+    with wave.open(fname, 'wb') as f:
         f.setnchannels(1)
         f.setsampwidth(2)
         f.setframerate(FRAME_RATE)
-        f.setnframes(len(amp16))
+        f.setnframes(len(wav))
         f.setcomptype('NONE', 'uncompressed')
 
-        f.writeframes(amp16.tobytes())
+        f.writeframes(wav)
+
+
+def main():
+    wav = amp_to_wav(generate_note(220, 5))
+    write_wav('sine220.wav', wav)
 
 
 if __name__ == '__main__':
