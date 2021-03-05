@@ -2,10 +2,9 @@ import io
 
 import numpy
 from matplotlib import animation
+from matplotlib import colors as mpc
+from matplotlib import pyplot as plt
 from scipy import ndimage
-import matplotlib.pyplot as plt
-import matplotlib.colors as mpc
-
 
 BLINKER = """
 0 0 0 0 0
