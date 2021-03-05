@@ -73,7 +73,7 @@ def add_structure(board, name, location):
 
 def create_board(h=200, w=300):
     board = numpy.zeros((h, w))
-    add_structure(board, 'R_PENTOMINO', (95, 145))
+    add_structure(board, 'R_PENTOMINO', (65, 145))
     return board
 
 
