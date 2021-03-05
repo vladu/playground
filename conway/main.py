@@ -1,4 +1,4 @@
-import io
+from importlib import resources as pkg_resources
 
 import numpy
 from matplotlib import animation
@@ -6,29 +6,7 @@ from matplotlib import colors as mpc
 from matplotlib import pyplot as plt
 from scipy import ndimage
 
-BLINKER = """
-0 0 0 0 0
-0 0 1 0 0
-0 0 1 0 0
-0 0 1 0 0
-0 0 0 0 0
-"""
-
-GLIDER = """
-0 0 0 0 0
-0 0 1 0 0
-0 0 0 1 0
-0 1 1 1 0
-0 0 0 0 0
-"""
-
-R_PENTOMINO = """
-0 0 0 0 0
-0 0 1 1 0
-0 1 1 0 0
-0 0 1 0 0
-0 0 0 0 0
-"""
+from conway import structures
 
 
 def calc_next_board(board):
@@ -47,7 +25,7 @@ def animate_board(board, generations=10, interval=50):
     cmap = mpc.ListedColormap(['black', 'tan'])
     img = plt.imshow(board, cmap=cmap)
     plt.axis('off')
-    plt.tight_layout(0.)
+    plt.tight_layout(pad=0.)
     fig.patch.set_facecolor('dimgrey')
 
     def _animate(idx):
@@ -61,8 +39,8 @@ def animate_board(board, generations=10, interval=50):
 
 
 def read_structure(name):
-    stream = io.StringIO(globals()[name])
-    return numpy.loadtxt(stream)
+    with pkg_resources.path(structures, '{}.txt'.format(name)) as p:
+        return numpy.loadtxt(p)
 
 
 def add_structure(board, name, location):
@@ -72,7 +50,7 @@ def add_structure(board, name, location):
 
 def create_board(h=200, w=300):
     board = numpy.zeros((h, w))
-    add_structure(board, 'R_PENTOMINO', (65, 145))
+    add_structure(board, 'r_pentomino', (65, 145))
     return board
 
 
