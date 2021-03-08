@@ -140,7 +140,7 @@ def _parse_spiro_defs(spiros_str):
 
 def _arg_parse():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-r', '--random', dest='random_count', default=2, help='Number of random spiros to draw')
+    parser.add_argument('-r', '--random', dest='random_count', default=2, type=int, help='Number of random spiros to draw')
     parser.add_argument('-s', '--spiro', dest='spiro_defs', default=None, type=_parse_spiro_defs)
     parser.add_argument('--demo', default=False, action='store_true')
     return parser.parse_args()
