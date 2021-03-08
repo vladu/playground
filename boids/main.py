@@ -17,8 +17,10 @@ def main(w=640, h=480, count=50, interval=50):
 
     def _update(idx):
         pos[:] = pos + vels
+        pos[:, 0] = numpy.where(pos[:, 0] < 0, h, numpy.where(pos[:, 0] > h, 0, pos[:, 0]))
+        pos[:, 1] = numpy.where(pos[:, 1] < 0, w, numpy.where(pos[:, 1] > w, 0, pos[:, 1]))
 
-        bodies.set_data(pos[:,1 ], pos[:, 0])
+        bodies.set_data(pos[:, 1], pos[:, 0])
         beaks.set_data((pos + vels)[:, 1], (pos + vels)[:, 0])
 
     anim = animation.FuncAnimation(fig, _update, interval=interval)
