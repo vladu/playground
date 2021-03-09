@@ -52,6 +52,10 @@ def update_positions(w, h, pos, vels):
     return pos
 
 
+def scatter(x, y, pos, vels, vel_max):
+    return limit(vels + 0.1 * (pos - [y, x]), vel_max)
+
+
 def main(w=640, h=480, count=50, interval=50, vel_max_incr=0.03, vel_max=2):
     pos, vels = initialize_data(w, h, count)
     fig, bodies, beaks = initialize_plots(w, h)
@@ -64,6 +68,13 @@ def main(w=640, h=480, count=50, interval=50, vel_max_incr=0.03, vel_max=2):
         beaks.set_data((pos + vels)[:, 1], (pos + vels)[:, 0])
 
     anim = animation.FuncAnimation(fig, _update, interval=interval)
+
+    def _onclick(event):
+        if event.button == 3:
+            vels[:] = scatter(event.xdata, event.ydata, pos, vels, vel_max)
+
+    cid = fig.canvas.mpl_connect('button_press_event', _onclick)
+
     plt.show()
 
 
