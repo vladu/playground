@@ -28,11 +28,19 @@ def limit(arr, val):
 def update_vels(pos, vels, vel_max_incr, vel_max):
     dist = sdist.squareform(sdist.pdist(pos))
 
+    # Separation
     too_close = dist < 25
     vel_incr1 = pos * too_close.sum(axis=1).reshape((pos.shape[0], 1)) - too_close.dot(pos)
     vel_incr1 = limit(vel_incr1, vel_max_incr)
 
-    vels = vels + vel_incr1
+    # Alignment
+    align = dist < 50
+    vel_incr2 = limit(align.dot(pos), vel_max_incr)
+
+    # Cohesion
+    vel_incr3 = limit(align.dot(pos) - pos, vel_max_incr)
+
+    vels = vels + vel_incr1 + vel_incr2 + vel_incr3
     vels = limit(vels, vel_max)
     return vels
 
